@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Relationship Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .container {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .result-box {
+            border: 1px solid #444;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            background-color: #333;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #000;
+        }
+        #family-tree {
+            width: 100%;
+            height: 500px;
+            background-color: #333;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .node circle {
+            fill: #fff;
+            stroke: steelblue;
+            stroke-width: 3px;
+            cursor: pointer;
+        }
+        .node text {
+            font: 12px sans-serif;
+            fill: #fff;
+        }
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 2px;
+        }
+        .ui-autocomplete {
+            background-color: #333;
+            border: 1px solid #444;
+            color: #fff;
+        }
+        .ui-autocomplete .ui-menu-item-wrapper.ui-state-active {
+            background-color: #007bff;
+            color: #fff;
+        }
+        #notFoundMessage {
+            display: none;
+            background-color: #dc3545;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .highlighted {
+            stroke: #ff0000;
+            stroke-width: 5px;
+        }
+        .path-highlight {
+            stroke: #00ff00;
+            stroke-width: 4px;
+        }
+        .modal-content {
+            background-color: #2a2a2a;
+            color: #fff;
+        }
+        .modal-header {
+            border-bottom: 1px solid #444;
+        }
+        .modal-footer {
+            border-top: 1px solid #444;
+        }
+        .form-control {
+            background-color: #333;
+            color: #fff;
+            border-color: #444;
+        }
+        .form-control:focus {
+            background-color: #444;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Family Relationship Explorer</h1>
+
+        <div id="notFoundMessage" class="alert alert-danger" role="alert">
+            Person not found. Please try a different name.
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h2 class="h4">Search Person</h2>
+                <div class="input-group mb-3">
+                    <input type="text" id="searchInput" class="form-control person-search" placeholder="Enter person's name">
+                    <button class="btn btn-primary" type="button" id="searchButton">Search</button>
+                </div>
+                <div id="searchResult" class="result-box" style="display: none;"></div>
+            </div>
+
+            <div class="col-md-6">
+                <h2 class="h4">Find Relationship</h2>
+                <div class="input-group mb-3">
+                    <input type="text" id="person1Input" class="form-control person-search" placeholder="Person 1">
+                    <input type="text" id="person2Input" class="form-control person-search" placeholder="Person 2">
+                    <button class="btn btn-success" type="button" id="findRelationshipButton">Find</button>
+                </div>
+                <div id="relationshipResult" class="result-box" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <button id="addPersonButton" class="btn btn-secondary">Add New Person</button>
+            </div>
+            <div class="col-md-6 text-end">
+                <button id="saveDataButton" class="btn btn-warning">Save Data</button>
+            </div>
+        </div>
+
+        <div id="family-tree"></div>
+    </div>
+
+    <!-- Add/Edit Person Modal -->
+    <div class="modal fade" id="personModal" tabindex="-1" aria-labelledby="personModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="personModalLabel">Add/Edit Person</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="personForm">
+                        <input type="hidden" id="personId">
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city">
+                        </div>
+                        <div class="mb-3">
+                            <label for="father" class="form-label">Father</label>
+                            <input type="text" class="form-control person-search" id="father">
+                        </div>
+                        <div class="mb-3">
+                            <label for="mother" class="form-label">Mother</label>
+                            <input type="text" class="form-control person-search" id="mother">
+                        </div>
+                        <div class="mb-3">
+                            <label for="spouse" class="form-label">Spouse</label>
+                            <input type="text" class="form-control person-search" id="spouse">
+                        </div>
+                        <div class="mb-3">
+                            <label for="siblings" class="form-label">Siblings (comma-separated)</label>
+                            <input type="text" class="form-control person-search" id="siblings">
+                        </div>
+                        <div class="mb-3">
+                            <label for="children" class="form-label">Children (comma-separated)</label>
+                            <input type="text" class="form-control person-search" id="children">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="savePersonButton">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let familyData = [];
+            let treeRoot;
+
+            // Sample initial data
+            const initialFamilyData = [
+                { id: 1, name: 'John Doe', city: 'New York', spouse: 2, siblings: [3, 4], parents: [5, 6], children: [7, 8] },
+                { id: 2, name: 'Jane Doe', city: 'New York', spouse: 1, siblings: [], parents: [9, 10], children: [7, 8] },
+                { id: 3, name: 'Mark Doe', city: 'Boston', spouse: null, siblings: [1, 4], parents: [5, 6], children: [] },
+                { id: 4, name: 'Mary Doe', city: 'Chicago', spouse: null, siblings: [1, 3], parents: [5, 6], children: [] },
+                { id: 5, name: 'Robert Doe', city: 'Philadelphia', spouse: 6, siblings: [], parents: [], children: [1, 3, 4] },
+                { id: 6, name: 'Sarah Doe', city: 'Philadelphia', spouse: 5, siblings: [], parents: [], children: [1, 3, 4] },
+                { id: 7, name: 'Tom Doe', city: 'San Francisco', spouse: null, siblings: [8], parents: [1, 2], children: [] },
+                { id: 8, name: 'Emily Doe', city: 'Los Angeles', spouse: null, siblings: [7], parents: [1, 2], children: [] },
+                { id: 9, name: 'William Smith', city: 'Miami', spouse: 10, siblings: [], parents: [], children: [2] },
+                { id: 10, name: 'Elizabeth Smith', city: 'Miami', spouse: 9, siblings: [], parents: [], children: [2] },
+            ];
+
+            // Load data from localStorage or use initial data
+            function loadData() {
+                const storedData = localStorage.getItem('familyData');
+                if (storedData) {
+                    familyData = JSON.parse(storedData);
+                } else {
+                    familyData = initialFamilyData;
+                }
+                updateFamilyTree();
+                setupAutocomplete();
+            }
+
+            loadData();
+
+            function saveFamilyData() {
+                localStorage.setItem('familyData', JSON.stringify(familyData));
+                alert('Family data saved successfully!');
+                updateFamilyTree();
+                setupAutocomplete();
+            }
+
+            function getRelationshipDetails(personId) {
+                const person = familyData.find(p => p.id === personId);
+                return person ? person.name : 'Unknown';
+            }
+
+            function searchPerson() {
+                const searchTerm = $('#searchInput').val();
+                const person = familyData.find(p => p.name.toLowerCase() === searchTerm.toLowerCase());
+
+                if (person) {
+                    const result = `
+                        <h3>${person.name}</h3>
+                        <p><strong>City:</strong> ${person.city}</p>
+                        <p><strong>Spouse:</strong> ${getRelationshipDetails(person.spouse)}</p>
+                        <p><strong>Siblings:</strong> ${person.siblings.map(getRelationshipDetails).join(', ')}</p>
+                        <p><strong>Parents:</strong> ${person.parents.map(getRelationshipDetails).join(', ')}</p>
+                        <p><strong>Children:</strong> ${person.children.map(getRelationshipDetails).join(', ')}</p>
+                        <button class="btn btn-primary btn-sm edit-person" data-id="${person.id}">Edit</button>
+                    `;
+                    $('#searchResult').html(result).show();
+                    $('#notFoundMessage').hide();
+                    highlightPerson(person.id);
+                } else {
+                    $('#searchResult').hide();
+                    $('#notFoundMessage').show();
+                }
+            }
+
+            function findRelationship() {
+                const person1 = $('#person1Input').val();
+                const person2 = $('#person2Input').val();
+
+                if (!person1 || !person2) {
+                    $('#relationshipResult').html('<p>Please select both persons to find the relationship.</p>').show();
+                    return;
+                }
+
+                const person1Data = familyData.find(p => p.name.toLowerCase() === person1.toLowerCase());
+                const person2Data = familyData.find(p => p.name.toLowerCase() === person2.toLowerCase());
+
+                if (!person1Data || !person2Data) {
+                    $('#relationshipResult').html('<p>One or both persons not found.</p>').show();
+                    return;
+                }
+
+                const path = findPath(person1Data.id, person2Data.id);
+                if (path) {
+                    const result = path.map(step =>
+                        `${getRelationshipDetails(step.from)} is ${step.relation} of ${getRelationshipDetails(step.to)}`
+                    ).join('<br>');
+                    $('#relationshipResult').html(`<h4>Relationship Path:</h4><p>${result}</p>`).show();
+                    highlightRelationship(person1Data.id, person2Data.id, path);
+                } else {
+                    $('#relationshipResult').html('<p>No relationship found.</p>').show();
+                }
+            }
+
+            function findPath(start, end, visited = new Set(), path = []) {
+                if (start === end) return path;
+                if (visited.has(start)) return null;
+
+                visited.add(start);
+                const person = familyData.find(p => p.id === start);
+
+                for (const relation of ['spouse', 'siblings', 'parents', 'children']) {
+                    const relatedIds = Array.isArray(person[relation]) ? person[relation] : [person[relation]];
+                    for (const id of relatedIds) {
+                        if (id) {
+                            const newPath = findPath(id, end, new Set(visited), [...path, { from: start, to: id, relation }]);
+                            if (newPath) return newPath;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            function addNewPerson() {
+                $('#personModalLabel').text('Add New Person');
+                $('#personForm')[0].reset();
+                $('#personId').val('');
+                $('#personModal').modal('show');
+            }
+
+            function editPerson(personId) {
+                const person = familyData.find(p => p.id === personId);
+                if (person) {
+                    $('#personModalLabel').text('Edit Person');
+                    $('#personId').val(person.id);
+                    $('#fullName').val(person.name);
+                    $('#city').val(person.city);
+                    $('#father').val(getRelationshipDetails(person.parents[0]));
+                    $('#mother').val(getRelationshipDetails(person.parents[1]));
+                    $('#spouse').val(getRelationshipDetails(person.spouse));
+                    $('#siblings').val(person.siblings.map(getRelationshipDetails).join(', '));
+                    $('#children').val(person.children.map(getRelationshipDetails).join(', '));
+                    $('#personModal').modal('show');
+                }
+            }
+
+            function savePerson() {
+                const personId = $('#personId').val();
+                const person = {
+                    id: personId ? parseInt(personId) : Math.max(...familyData.map(p => p.id)) + 1,
+                    name: $('#fullName').val(),
+                    city: $('#city').val(),
+                    parents: [],
+                    spouse: null,
+                    siblings: [],
+                    children: []
+                };
+
+                const father = familyData.find(p => p.name === $('#father').val());
+                const mother = familyData.find(p => p.name === $('#mother').val());
+                if (father) person.parents.push(father.id);
+                if (mother) person.parents.push(mother.id);
+
+                const spouse = familyData.find(p => p.name === $('#spouse').val());
+                if (spouse) person.spouse = spouse.id;
+
+                const siblings = $('#siblings').val().split(',').map(s => s.trim());
+                person.siblings = siblings.map(s => {
+                    const sibling = familyData.find(p => p.name === s);
+                    return sibling ? sibling.id : null;
+                }).filter(id => id !== null);
+
+                const children = $('#children').val().split(',').map(s => s.trim());
+                person.children = children.map(c => {
+                    const child = familyData.find(p => p.name === c);
+                    return child ? child.id : null;
+                }).filter(id => id !== null);
+
+                if (personId) {
+                    const index = familyData.findIndex(p => p.id === parseInt(personId));
+                    if (index !== -1) {
+                        familyData[index] = person;
+                    }
+                } else {
+                    familyData.push(person);
+                }
+
+                saveFamilyData();
+                $('#personModal').modal('hide');
+            }
+
+            function updateFamilyTree() {
+                const width = $('#family-tree').width();
+                const height = $('#family-tree').height();
+                const margin = { top: 20, right: 90, bottom: 30, left: 90 };
+
+                // Clear previous SVG
+                d3.select("#family-tree").selectAll("*").remove();
+
+                const svg = d3.select("#family-tree")
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const treeData = createTreeData();
+
+                const treeLayout = d3.tree().size([height - margin.top - margin.bottom, width - margin.left - margin.right]);
+                treeRoot = d3.hierarchy(treeData);
+                treeLayout(treeRoot);
+
+                // Add links
+                svg.selectAll(".link")
+                    .data(treeRoot.links())
+                    .enter().append("path")
+                    .attr("class", "link")
+                    .attr("d", d3.linkHorizontal()
+                        .x(d => d.y)
+                        .y(d => d.x));
+
+                // Add nodes
+                const node = svg.selectAll(".node")
+                    .data(treeRoot.descendants())
+                    .enter().append("g")
+                    .attr("class", "node")
+                    .attr("transform", d => `translate(${d.y},${d.x})`)
+                    .on("click", (event, d) => editPerson(d.data.id));
+
+                node.append("circle")
+                    .attr("r", 10)
+                    .attr("id", d => `node-${d.data.id}`);
+
+                node.append("text")
+                    .attr("dy", ".35em")
+                    .attr("x", d => d.children ? -13 : 13)
+                    .style("text-anchor", d => d.children ? "end" : "start")
+                    .text(d => d.data.name);
+            }
+
+            function createTreeData() {
+                const rootPerson = familyData.find(p => p.parents.length === 0);
+                return createSubTree(rootPerson.id);
+            }
+
+            function createSubTree(personId) {
+                const person = familyData.find(p => p.id === personId);
+                const node = { name: person.name, id: person.id, children: [] };
+
+                if (person.spouse) {
+                    const spouse = familyData.find(p => p.id === person.spouse);
+                    node.children.push({ name: spouse.name, id: spouse.id });
+                }
+
+                person.children.forEach(childId => {
+                    const childNode = createSubTree(childId);
+                    node.children.push(childNode);
+                });
+
+                return node;
+            }
+
+            function setupAutocomplete() {
+                const names = familyData.map(person => person.name);
+                $(".person-search").autocomplete({
+                    source: names,
+                    minLength: 2,
+                    select: function(event, ui) {
+                        $(this).val(ui.item.value);
+                        if (this.id === 'searchInput') {
+                            searchPerson();
+                        }
+                        return false;
+                    }
+                });
+            }
+
+            function highlightPerson(personId) {
+                // Remove previous highlights
+                d3.selectAll('.highlighted').classed('highlighted', false);
+
+                // Highlight the selected person
+                d3.select(`#node-${personId}`).classed('highlighted', true);
+            }
+
+            function highlightRelationship(person1Id, person2Id, path) {
+                // Remove previous highlights
+                d3.selectAll('.highlighted').classed('highlighted', false);
+                d3.selectAll('.path-highlight').classed('path-highlight', false);
+
+                // Highlight the selected persons
+                d3.select(`#node-${person1Id}`).classed('highlighted', true);
+                d3.select(`#node-${person2Id}`).classed('highlighted', true);
+
+                // Highlight the path
+                path.forEach(step => {
+                    const linkSelector = `.link:has(path[id="link-${step.from}-${step.to}"], path[id="link-${step.to}-${step.from}"])`;
+                    d3.selectAll(linkSelector).classed('path-highlight', true);
+                });
+            }
+
+            // Event listeners
+            $('#searchButton').on('click', searchPerson);
+            $('#findRelationshipButton').on('click', findRelationship);
+            $('#addPersonButton').on('click', addNewPerson);
+            $('#saveDataButton').on('click', saveFamilyData);
+            $('#savePersonButton').on('click', savePerson);
+            $(document).on('click', '.edit-person', function() {
+                editPerson(parseInt($(this).data('id')));
+            });
+
+            // Initial tree rendering and autocomplete setup
+            updateFamilyTree();
+            setupAutocomplete();
+        });
+    </script>
+</body>
+</html>
