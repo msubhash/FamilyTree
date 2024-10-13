@@ -39,17 +39,18 @@
             background-color: #FF8C00;
         }
         #posterContainer {
-            width: 100%;
-            max-width: 800px;
+            width: 600px;
             height: 600px;
             background-color: #FFA500;
             color: black;
-            padding: 20px;
+            padding: 40px;
             box-sizing: border-box;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .poster {
-            width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -57,43 +58,37 @@
         }
         .content {
             flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .english-text {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .sanskrit-text {
             font-size: 28px;
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: center;
+        }
+        .sanskrit-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
         }
         .divider {
             border-top: 1px solid black;
-            margin: 10px 0;
+            margin: 15px 0;
         }
         .breakdown {
-            font-size: 18px;
+            font-size: 16px;
             white-space: pre-wrap;
             word-wrap: break-word;
+            text-align: center;
         }
         .footer {
             display: flex;
             justify-content: space-between;
             font-size: 14px;
-            margin-top: auto;
-        }
-        @media (max-width: 600px) {
-            #posterContainer {
-                height: auto;
-                min-height: 600px;
-            }
-            .english-text, .sanskrit-text {
-                font-size: 24px;
-            }
-            .breakdown {
-                font-size: 16px;
-            }
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -138,7 +133,11 @@
             const posterContainer = document.getElementById('posterContainer');
             posterContainer.innerHTML = posterHTML;
 
-            html2canvas(posterContainer).then(canvas => {
+            html2canvas(posterContainer, {
+                width: 600,
+                height: 600,
+                scale: 2 // Increase resolution for sharper image
+            }).then(canvas => {
                 const img = canvas.toDataURL('image/png');
                 const downloadLink = document.createElement('a');
                 downloadLink.href = img;
