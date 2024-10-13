@@ -58,9 +58,24 @@
         .content {
             flex-grow: 1;
         }
+        .english-text {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .sanskrit-text {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
         .divider {
-            border-top: 2px solid black;
+            border-top: 1px solid black;
             margin: 10px 0;
+        }
+        .breakdown {
+            font-size: 18px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
         .footer {
             display: flex;
@@ -68,14 +83,16 @@
             font-size: 14px;
             margin-top: auto;
         }
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
         @media (max-width: 600px) {
             #posterContainer {
                 height: auto;
                 min-height: 600px;
+            }
+            .english-text, .sanskrit-text {
+                font-size: 24px;
+            }
+            .breakdown {
+                font-size: 16px;
             }
         }
     </style>
@@ -106,10 +123,10 @@
             const posterHTML = `
                 <div class="poster">
                     <div class="content">
-                        <h2>${englishSentence}</h2>
-                        <h3>${sanskritSentence}</h3>
+                        <div class="english-text">${englishSentence}</div>
+                        <div class="sanskrit-text">${sanskritSentence}</div>
                         <div class="divider"></div>
-                        <pre>${breakdown}</pre>
+                        <div class="breakdown">${breakdown}</div>
                     </div>
                     <div class="footer">
                         <span>www.easysanskrit.com</span>
