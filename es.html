@@ -4,92 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sanskrit Poster Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        input, textarea, button {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            background-color: #FFA500;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #FF8C00;
-        }
-        #posterContainer {
-            width: 100%;
-            max-width: 800px;
-            height: 600px;
-            background-color: #FFA500;
-            color: black;
-            padding: 20px;
-            box-sizing: border-box;
-            margin: 0 auto;
-        }
-        .poster {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .content {
-            flex-grow: 1;
-        }
-        .divider {
-            border-top: 2px solid black;
-            margin: 10px 0;
-        }
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin-top: auto;
-        }
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        @media (max-width: 600px) {
-            #posterContainer {
-                height: auto;
-                min-height: 600px;
-            }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'poster-orange': '#FFA500',
+                    },
+                },
+            },
+        }
+    </script>
 </head>
-<body>
-    <div class="container">
-        <h1>Sanskrit Poster Generator</h1>
-        <form id="posterForm">
-            <input type="text" id="englishSentence" placeholder="Enter English sentence" required>
-            <input type="text" id="sanskritSentence" placeholder="Enter Sanskrit sentence" required>
-            <textarea id="breakdown" placeholder="Enter word breakdown" required></textarea>
-            <button type="submit">Generate Poster</button>
+<body class="bg-gray-100 text-gray-900 font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <h1 class="text-3xl font-bold mb-6">Sanskrit Poster Generator</h1>
+        <form id="posterForm" class="space-y-4 mb-8">
+            <input type="text" id="englishSentence" placeholder="Enter English sentence" required class="w-full p-2 border border-gray-300 rounded">
+            <input type="text" id="sanskritSentence" placeholder="Enter Sanskrit sentence" required class="w-full p-2 border border-gray-300 rounded">
+            <textarea id="breakdown" placeholder="Enter word breakdown" required class="w-full p-2 border border-gray-300 rounded h-32"></textarea>
+            <button type="submit" class="bg-poster-orange text-white font-semibold py-2 px-4 rounded hover:bg-orange-600 transition duration-300">Generate Poster</button>
         </form>
-        <div id="posterContainer"></div>
+        <div id="posterContainer" class="w-full max-w-3xl h-[600px] bg-poster-orange text-black p-6 mx-auto"></div>
     </div>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script>
@@ -104,14 +47,14 @@
             const breakdown = document.getElementById('breakdown').value;
 
             const posterHTML = `
-                <div class="poster">
-                    <div class="content">
-                        <h2>${englishSentence}</h2>
-                        <h3>${sanskritSentence}</h3>
-                        <div class="divider"></div>
-                        <pre>${breakdown}</pre>
+                <div class="flex flex-col justify-between h-full">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-2">${englishSentence}</h2>
+                        <h3 class="text-2xl font-semibold mb-4">${sanskritSentence}</h3>
+                        <div class="border-t-2 border-black my-4"></div>
+                        <pre class="whitespace-pre-wrap text-lg">${breakdown}</pre>
                     </div>
-                    <div class="footer">
+                    <div class="flex justify-between text-sm mt-4">
                         <span>www.easysanskrit.com</span>
                         <span>@easy_sanskrit</span>
                     </div>
@@ -127,8 +70,7 @@
                 downloadLink.href = img;
                 downloadLink.download = 'sanskrit_poster.png';
                 downloadLink.innerHTML = 'Download Poster';
-                downloadLink.style.display = 'block';
-                downloadLink.style.marginTop = '20px';
+                downloadLink.className = 'block mt-4 text-blue-600 hover:text-blue-800';
                 posterContainer.appendChild(downloadLink);
             });
         }
