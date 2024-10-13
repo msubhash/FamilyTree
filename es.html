@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanskrit Poster Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sanskrit Poster Generator</h1>
+        <form id="posterForm">
+            <input type="text" id="englishSentence" placeholder="Enter English sentence" required>
+            <input type="text" id="sanskritSentence" placeholder="Enter Sanskrit sentence" required>
+            <textarea id="breakdown" placeholder="Enter word breakdown" required></textarea>
+            <button type="submit">Generate Poster</button>
+        </form>
+        <div id="posterContainer"></div>
+    </div>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+```
+
+2. CSS Styling (styles.css):
+```css
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input, textarea, button {
+    padding: 10px;
+    font-size: 16px;
+}
+
+#posterContainer {
+    width: 800px;
+    height: 600px;
+    background-color: #FFA500;
+    color: black;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.poster {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.content {
+    flex-grow: 1;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+```
+
+3. JavaScript Logic (script.js):
+```javascript
+document.getElementById('posterForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    generatePoster();
+});
+
+function generatePoster() {
+    const englishSentence = document.getElementById('englishSentence').value;
+    const sanskritSentence = document.getElementById('sanskritSentence').value;
+    const breakdown = document.getElementById('breakdown').value;
+
+    const posterHTML = `
+        <div class="poster">
+            <div class="content">
+                <h2>${englishSentence}</h2>
+                <h3>${sanskritSentence}</h3>
+                <pre>${breakdown}</pre>
+            </div>
+            <div class="footer">
+                <span>www.easysanskrit.com</span>
+                <span>@easy_sanskrit</span>
+            </div>
+        </div>
+    `;
+
+    const posterContainer = document.getElementById('posterContainer');
+    posterContainer.innerHTML = posterHTML;
+
+    html2canvas(posterContainer).then(canvas => {
+        const img = canvas.toDataURL('image/png');
+        const downloadLink = document.createElement('a');
+        downloadLink.href = img;
+        downloadLink.download = 'sanskrit_poster.png';
+        downloadLink.innerHTML = 'Download Poster';
+        posterContainer.appendChild(downloadLink);
+    });
+
+}
