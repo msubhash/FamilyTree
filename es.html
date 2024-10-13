@@ -58,10 +58,15 @@
         .content {
             flex-grow: 1;
         }
+        .divider {
+            border-top: 2px solid black;
+            margin: 10px 0;
+        }
         .footer {
             display: flex;
             justify-content: space-between;
             font-size: 14px;
+            margin-top: auto;
         }
         pre {
             white-space: pre-wrap;
@@ -71,10 +76,6 @@
             #posterContainer {
                 height: auto;
                 min-height: 600px;
-            }
-            .footer {
-                flex-direction: column;
-                align-items: center;
             }
         }
     </style>
@@ -107,6 +108,7 @@
                     <div class="content">
                         <h2>${englishSentence}</h2>
                         <h3>${sanskritSentence}</h3>
+                        <div class="divider"></div>
                         <pre>${breakdown}</pre>
                     </div>
                     <div class="footer">
