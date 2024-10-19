@@ -150,7 +150,7 @@
 
             const prompt = `Breakdown sanskrit translation with pronunciation for words. Don't give any other text, just translation breakdown of each word. "${englishSentence}" "${sanskritSentence}"`;
             const encodedPrompt = encodeURIComponent(prompt);
-            const chatGPTURL = `https://chat.openai.com/chat/?q=${encodedPrompt}`;
+            const chatGPTURL = `https://chatgpt.com?q=${encodedPrompt}`;
 
             const linkContainer = document.getElementById('chatGPTLinkContainer');
             linkContainer.innerHTML = `<a href="${chatGPTURL}" target="_blank" id="chatGPTLink">Open in ChatGPT</a>`;
