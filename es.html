@@ -94,6 +94,25 @@
             margin-top: 20px;
             font-weight: bold;
         }
+        #chatGPTLink {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        #chatGPTLink:hover {
+            background-color: #45a049;
+        }
+        #generateChatGPTLink {
+            background-color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        #generateChatGPTLink:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -102,6 +121,8 @@
         <form id="posterForm">
             <input type="text" id="englishSentence" placeholder="Enter English sentence" required>
             <input type="text" id="sanskritSentence" placeholder="Enter Sanskrit sentence" required>
+            <button type="button" id="generateChatGPTLink">Generate ChatGPT Link</button>
+            <div id="chatGPTLinkContainer"></div>
             <textarea id="breakdown" placeholder="Enter word breakdown" required></textarea>
             <button type="submit">Generate Poster</button>
         </form>
@@ -113,6 +134,27 @@
             e.preventDefault();
             generatePoster();
         });
+
+        document.getElementById('generateChatGPTLink').addEventListener('click', function() {
+            generateChatGPTLink();
+        });
+
+        function generateChatGPTLink() {
+            const englishSentence = document.getElementById('englishSentence').value;
+            const sanskritSentence = document.getElementById('sanskritSentence').value;
+            
+            if (!englishSentence || !sanskritSentence) {
+                alert('Please enter both English and Sanskrit sentences.');
+                return;
+            }
+
+            const prompt = `Breakdown sanskrit translation with pronunciation for words. Don't give any other text, just translation breakdown of each word. "${englishSentence}" "${sanskritSentence}"`;
+            const encodedPrompt = encodeURIComponent(prompt);
+            const chatGPTURL = `https://chat.openai.com/chat/?q=${encodedPrompt}`;
+
+            const linkContainer = document.getElementById('chatGPTLinkContainer');
+            linkContainer.innerHTML = `<a href="${chatGPTURL}" target="_blank" id="chatGPTLink">Open in ChatGPT</a>`;
+        }
 
         function generatePoster() {
             const englishSentence = document.getElementById('englishSentence').value;
