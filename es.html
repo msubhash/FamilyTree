@@ -46,55 +46,124 @@
             height: 600px;
             background-color: #FFA500;
             color: black;
-            padding: 20px;
+            padding: 40px;
             box-sizing: border-box;
-            margin-bottom: 20px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .info-text {
-            font-size: 14px;
+        .poster {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .english-text {
+            font-size: 45px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .sanskrit-text {
+            font-size: 45px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .divider {
+            border-top: 1px solid black;
+            margin: 20px 0;
+        }
+        .breakdown {
+            font-size: 18px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: center;
             line-height: 1.6;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #chatGPTLink {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        #chatGPTLink:hover {
+            background-color: #45a049;
+        }
+        #generateChatGPTLink {
+            background-color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        #generateChatGPTLink:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <form>
-            <input type="text" id="englishSentence" placeholder="Enter English Sentence" required>
-            <input type="text" id="sanskritSentence" placeholder="Enter Sanskrit Sentence" required>
-            <textarea id="breakdown" placeholder="Enter Breakdown"></textarea>
-            <button onclick="generateChatGPTLink()">Generate ChatGPT Link</button>
-            <button onclick="generatePoster()">Generate Poster</button>
+        <h1>Sanskrit Poster Generator</h1>
+        <form id="posterForm">
+            <input type="text" id="englishSentence" placeholder="Enter English sentence" required>
+            <input type="text" id="sanskritSentence" placeholder="Enter Sanskrit sentence" required>
+            <button type="button" id="generateChatGPTLink">Generate ChatGPT Link</button>
+            <div id="chatGPTLinkContainer"></div>
+            <textarea id="breakdown" placeholder="Enter word breakdown" required></textarea>
+            <button type="submit">Generate Poster</button>
         </form>
-        <div id="chatGPTLinkContainer"></div>
         <div id="posterContainer"></div>
-        <div class="info-text">
-            Easy Sanskrit provides the easiest way to learn Sanskrit - by learning simple, everyday conversations.
-            <br/><br/>Get started to learn Sanskrit -
-            <br/><br/><a href="https://easysanskrit.com/getting-started-to-learn-sanskrit-d69310847de0" target="_blank">https://easysanskrit.com/getting-started-to-learn-sanskrit-d69310847de0</a>
-            <br/><br>
-            #EasySanskrit #Sanskrit #LearnSanskrit #SanskritConversations
-        </div>
     </div>
-
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script>
+        document.getElementById('posterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generatePoster();
+        });
+
+        document.getElementById('generateChatGPTLink').addEventListener('click', function() {
+            generateChatGPTLink();
+        });
+
         function generateChatGPTLink() {
             const englishSentence = document.getElementById('englishSentence').value;
             const sanskritSentence = document.getElementById('sanskritSentence').value;
+
             if (!englishSentence || !sanskritSentence) {
                 alert('Please enter both English and Sanskrit sentences.');
                 return;
             }
+
             const prompt = `Breakdown sanskrit translation with pronunciation for words. Don't give any other text, just translation breakdown of each word. "${englishSentence}" "${sanskritSentence}"`;
             const encodedPrompt = encodeURIComponent(prompt);
             const chatGPTURL = `https://chatgpt.com?q=${encodedPrompt}`;
+
             const linkContainer = document.getElementById('chatGPTLinkContainer');
             linkContainer.innerHTML = `<a href="${chatGPTURL}" target="_blank" id="chatGPTLink">Open in ChatGPT</a>`;
         }
-        
+
         function generatePoster() {
             const englishSentence = document.getElementById('englishSentence').value;
             const sanskritSentence = document.getElementById('sanskritSentence').value;
             const breakdown = document.getElementById('breakdown').value;
+
             const posterHTML = `
                 <div class="poster">
                     <div class="content">
@@ -109,8 +178,10 @@
                     </div>
                 </div>
             `;
+
             const posterContainer = document.getElementById('posterContainer');
             posterContainer.innerHTML = posterHTML;
+
             html2canvas(posterContainer, {
                 width: 600,
                 height: 600,
