@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -117,6 +116,54 @@
         #generateChatGPTLink:hover {
             background-color: #45a049;
         }
+        .info-box {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .info-box p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .info-box a {
+            color: #FFA500;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .info-box a:hover {
+            text-decoration: underline;
+        }
+
+        .info-box .hashtags {
+            color: #666;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        /* Add these styles */
+        .copy-btn {
+            float: right;
+            background-color: #FFA500;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .copy-btn:hover {
+            background-color: #FF8C00;
+        }
+
+        .copy-btn.copied {
+            background-color: #4CAF50;
+        }
     </style>
 </head>
 <body>
@@ -131,6 +178,17 @@
             <button type="submit">Generate Poster</button>
         </form>
         <div id="posterContainer"></div>
+        <div id="additionalInfo" class="info-box">
+            <button id="copyInfoButton" class="copy-btn">Copy Text</button>
+            <p>Easy Sanskrit provides the easiest way to learn Sanskrit - by learning simple, everyday conversations.</p>
+            <p>Get started to learn Sanskrit -</p>
+            <a href="https://easysanskrit.com/getting-started-to-learn-sanskrit-d69310847de0" target="_blank">
+                https://easysanskrit.com/getting-started-to-learn-sanskrit-d69310847de0
+            </a>
+            <p class="hashtags">
+                #EasySanskrit #Sanskrit #LearnSanskrit #SanskritConversations
+            </p>
+        </div>
     </div>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script>
@@ -198,6 +256,23 @@
                 posterContainer.appendChild(downloadLink);
             });
         }
+
+        // Add this script
+        document.getElementById('copyInfoButton').addEventListener('click', function() {
+            const infoBox = document.getElementById('additionalInfo');
+            const textToCopy = infoBox.innerText.replace('Copy Text', '').trim();
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const button = this;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = 'Copy Text';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        });
     </script>
 </body>
 </html>

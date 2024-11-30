@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="""en"></html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="""UTF-8">
+    <meta name="""viewport" content="""width=device-width, initial-scale=1.0">
     <title>Family Relationship Explorer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
@@ -107,6 +107,99 @@
             background-color: #444;
             color: #fff;
         }
+        /* Add these styles to your existing CSS */
+        .ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 9999;
+        }
+
+        .ui-autocomplete .ui-menu-item {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .ui-autocomplete .ui-menu-item:hover {
+            background-color: #444;
+        }
+        .result-box {
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        .close-btn:hover {
+            color: #dc3545;
+        }
+
+        /* Add these CSS classes in the style section */
+        .link-spouse {
+            stroke: #ff4444;  /* Red */
+        }
+        .link-sibling {
+            stroke: #4444ff;  /* Blue */
+        }
+        .link-parent {
+            stroke: #ffffff;  /* White */
+        }
+        .link-child {
+            stroke: #44ff44;  /* Green */
+        }
+
+        /* Add these styles to your existing CSS */
+        .legend-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 5px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .legend-label {
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .legend-color.spouse {
+            background-color: #ff4444;
+        }
+
+        .legend-color.sibling {
+            background-color: #4444ff;
+        }
+
+        .legend-color.parent {
+            background-color: #ffffff;
+        }
+
+        .legend-color.child {
+            background-color: #44ff44;
+        }
     </style>
 </head>
 <body>
@@ -124,7 +217,10 @@
                     <input type="text" id="searchInput" class="form-control person-search" placeholder="Enter person's name">
                     <button class="btn btn-primary" type="button" id="searchButton">Search</button>
                 </div>
-                <div id="searchResult" class="result-box" style="display: none;"></div>
+                <div id="searchResult" class="result-box" style="display: none;">
+                    <button class="close-btn">&times;</button>
+                    <div class="result-content"></div>
+                </div>
             </div>
 
             <div class="col-md-6">
@@ -134,7 +230,10 @@
                     <input type="text" id="person2Input" class="form-control person-search" placeholder="Person 2">
                     <button class="btn btn-success" type="button" id="findRelationshipButton">Find</button>
                 </div>
-                <div id="relationshipResult" class="result-box" style="display: none;"></div>
+                <div id="relationshipResult" class="result-box" style="display: none;">
+                    <button class="close-btn">&times;</button>
+                    <div class="result-content"></div>
+                </div>
             </div>
         </div>
 
@@ -144,6 +243,28 @@
             </div>
             <div class="col-md-6 text-end">
                 <button id="saveDataButton" class="btn btn-warning">Save Data</button>
+            </div>
+        </div>
+
+        <!-- Add this HTML just before the family-tree div -->
+        <div id="relationship-legend" class="mb-3">
+            <div class="legend-container">
+                <div class="legend-item">
+                    <span class="legend-color spouse"></span>
+                    <span class="legend-label">Spouse</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color sibling"></span>
+                    <span class="legend-label">Sibling</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color parent"></span>
+                    <span class="legend-label">Parent</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color child"></span>
+                    <span class="legend-label">Child</span>
+                </div>
             </div>
         </div>
 
@@ -168,6 +289,10 @@
                         <div class="mb-3">
                             <label for="city" class="form-label">City</label>
                             <input type="text" class="form-control" id="city">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="+91-XXXXXXXXXX">
                         </div>
                         <div class="mb-3">
                             <label for="father" class="form-label">Father</label>
@@ -210,8 +335,8 @@
 
             // Sample initial data
             const initialFamilyData = [
-                { id: 1, name: 'Srinivas', city: 'Chennai', spouse: 2, siblings: [3, 4], parents: [5, 6], children: [7, 8] },
-                { id: 2, name: 'Babu', city: 'Bengaluru', spouse: 1, siblings: [], parents: [9, 10], children: [7, 8] },
+                { id: 1, name: 'Srinivas', city: 'Chennai', phone: '+91-9876543210', spouse: 2, siblings: [3, 4], parents: [5, 6], children: [7, 8] },
+                { id: 2, name: 'Babu', city: 'Bengaluru', phone: '+91-9876543211', spouse: 1, siblings: [], parents: [9, 10], children: [7, 8] },
                 { id: 3, name: 'Shiva', city: 'Vellore', spouse: null, siblings: [1, 4], parents: [5, 6], children: [] },
                 { id: 4, name: 'Priya', city: 'Mysore', spouse: null, siblings: [1, 3], parents: [5, 6], children: [] },
                 { id: 5, name: 'Rajan', city: 'Chennai', spouse: 6, siblings: [], parents: [], children: [1, 3, 4] },
@@ -256,13 +381,15 @@
                     const result = `
                         <h3>${person.name}</h3>
                         <p><strong>City:</strong> ${person.city}</p>
+                        <p><strong>Phone:</strong> ${person.phone || 'N/A'}</p>
                         <p><strong>Spouse:</strong> ${getRelationshipDetails(person.spouse)}</p>
                         <p><strong>Siblings:</strong> ${person.siblings.map(getRelationshipDetails).join(', ')}</p>
                         <p><strong>Parents:</strong> ${person.parents.map(getRelationshipDetails).join(', ')}</p>
                         <p><strong>Children:</strong> ${person.children.map(getRelationshipDetails).join(', ')}</p>
                         <button class="btn btn-primary btn-sm edit-person" data-id="${person.id}">Edit</button>
                     `;
-                    $('#searchResult').html(result).show();
+                    $('#searchResult .result-content').html(result);
+                    $('#searchResult').show();
                     $('#notFoundMessage').hide();
                     highlightPerson(person.id);
                 } else {
@@ -293,10 +420,12 @@
                     const result = path.map(step =>
                         `${getRelationshipDetails(step.from)} is ${step.relation} of ${getRelationshipDetails(step.to)}`
                     ).join('<br>');
-                    $('#relationshipResult').html(`<h4>Relationship Path:</h4><p>${result}</p>`).show();
+                    $('#relationshipResult .result-content').html(`<h4>Relationship Path:</h4><p>${result}</p>`);
+                    $('#relationshipResult').show();
                     highlightRelationship(person1Data.id, person2Data.id, path);
                 } else {
-                    $('#relationshipResult').html('<p>No relationship found.</p>').show();
+                    $('#relationshipResult .result-content').html('<p>No relationship found.</p>');
+                    $('#relationshipResult').show();
                 }
             }
 
@@ -334,6 +463,7 @@
                     $('#personId').val(person.id);
                     $('#fullName').val(person.name);
                     $('#city').val(person.city);
+                    $('#phone').val(person.phone); // Add phone
                     $('#father').val(getRelationshipDetails(person.parents[0]));
                     $('#mother').val(getRelationshipDetails(person.parents[1]));
                     $('#spouse').val(getRelationshipDetails(person.spouse));
@@ -349,6 +479,7 @@
                     id: personId ? parseInt(personId) : Math.max(...familyData.map(p => p.id)) + 1,
                     name: $('#fullName').val(),
                     city: $('#city').val(),
+                    phone: $('#phone').val(), // Add phone
                     parents: [],
                     spouse: null,
                     siblings: [],
@@ -409,11 +540,35 @@
                 treeRoot = d3.hierarchy(treeData);
                 treeLayout(treeRoot);
 
-                // Add links
+                function determineRelationship(source, target) {
+                    const sourcePerson = familyData.find(p => p.name === source.data.name);
+                    const targetPerson = familyData.find(p => p.name === target.data.name);
+                    
+                    if (!sourcePerson || !targetPerson) return 'parent';
+                    
+                    if (sourcePerson.spouse === targetPerson.id || targetPerson.spouse === sourcePerson.id) {
+                        return 'spouse';
+                    }
+                    if (sourcePerson.siblings.includes(targetPerson.id) || targetPerson.siblings.includes(sourcePerson.id)) {
+                        return 'sibling';
+                    }
+                    if (sourcePerson.children.includes(targetPerson.id)) {
+                        return 'child';
+                    }
+                    if (targetPerson.children.includes(sourcePerson.id)) {
+                        return 'parent';
+                    }
+                    return 'parent';  // default relationship
+                }
+
+                // Update the link creation code
                 svg.selectAll(".link")
                     .data(treeRoot.links())
                     .enter().append("path")
-                    .attr("class", "link")
+                    .attr("class", d => {
+                        const relationship = determineRelationship(d.source, d.target);
+                        return `link link-${relationship}`;
+                    })
                     .attr("d", d3.linkHorizontal()
                         .x(d => d.y)
                         .y(d => d.x));
@@ -461,7 +616,9 @@
 
             function setupAutocomplete() {
                 const names = familyData.map(person => person.name);
-                $(".person-search").autocomplete({
+
+                // Basic search autocomplete
+                $("#searchInput, #person1Input, #person2Input").autocomplete({
                     source: names,
                     minLength: 2,
                     select: function(event, ui) {
@@ -471,6 +628,63 @@
                         }
                         return false;
                     }
+                });
+
+                // Relationship fields autocomplete with validation
+                $("#father, #mother, #spouse").autocomplete({
+                    source: function(request, response) {
+                        const gender = this.element[0].id; // father, mother, or spouse
+                        const currentPersonId = $('#personId').val();
+
+                        // Filter out current person and existing relationships
+                        let suggestions = names.filter(name => {
+                            const person = familyData.find(p => p.name === name);
+                            if (!person || (currentPersonId && person.id === parseInt(currentPersonId))) {
+                                return false;
+                            }
+                            return true;
+                        });
+
+                        response(suggestions.filter(name =>
+                            name.toLowerCase().includes(request.term.toLowerCase())
+                        ));
+                    },
+                    minLength: 1
+                });
+
+                // Multiple selection autocomplete for siblings and children
+                $("#siblings, #children").autocomplete({
+                    source: function(request, response) {
+                        const currentPersonId = $('#personId').val();
+                        const currentInput = this.element[0];
+                        const currentTerms = currentInput.value.split(/,\s*/);
+                        const currentTerm = currentTerms[currentTerms.length - 1];
+
+                        let suggestions = names.filter(name => {
+                            const person = familyData.find(p => p.name === name);
+                            if (!person || (currentPersonId && person.id === parseInt(currentPersonId))) {
+                                return false;
+                            }
+                            return true;
+                        });
+
+                        response(suggestions.filter(name =>
+                            name.toLowerCase().includes(currentTerm.toLowerCase()) &&
+                            !currentTerms.includes(name)
+                        ));
+                    },
+                    focus: function() {
+                        return false;
+                    },
+                    select: function(event, ui) {
+                        const terms = this.value.split(/,\s*/);
+                        terms.pop();
+                        terms.push(ui.item.value);
+                        terms.push("");
+                        this.value = terms.join(", ");
+                        return false;
+                    },
+                    minLength: 1
                 });
             }
 
@@ -506,6 +720,14 @@
             $('#savePersonButton').on('click', savePerson);
             $(document).on('click', '.edit-person', function() {
                 editPerson(parseInt($(this).data('id')));
+            });
+
+            // Add these event handlers in your $(document).ready function
+            $('.close-btn').on('click', function() {
+                $(this).closest('.result-box').hide();
+                // Remove highlights when closing results
+                d3.selectAll('.highlighted').classed('highlighted', false);
+                d3.selectAll('.path-highlight').classed('path-highlight', false);
             });
 
             // Initial tree rendering and autocomplete setup
